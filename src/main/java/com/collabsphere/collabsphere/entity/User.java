@@ -38,4 +38,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<TeamMember> teams = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments = new ArrayList<>();
 }
