@@ -41,4 +41,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "uploadedBy")
+    private List<Attachment> attachments = new ArrayList<>();
 }
