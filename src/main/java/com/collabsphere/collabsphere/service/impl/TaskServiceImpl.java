@@ -9,6 +9,7 @@ import com.collabsphere.collabsphere.repository.ProjectRepository;
 import com.collabsphere.collabsphere.repository.TaskRepository;
 import com.collabsphere.collabsphere.repository.TeamMemberRepository;
 import com.collabsphere.collabsphere.repository.UserRepository;
+import com.collabsphere.collabsphere.service.NotificationService;
 import com.collabsphere.collabsphere.service.TaskService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.collabsphere.collabsphere.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,8 @@ public class TaskServiceImpl implements TaskService {
     private final ProjectRepository projectRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
+
 
     @Override
     public TaskResponse createTask(Long projectId, CreateTaskRequest request) {
@@ -214,6 +218,10 @@ public class TaskServiceImpl implements TaskService {
         task.setAssignee(assignee);
 
         task = taskRepository.save(task);
+        notificationService.createNotification(
+                assignee,
+                "You have been assigned to task: " + task.getTitle()
+        );
 
         return TaskResponse.builder()
                 .id(task.getId())

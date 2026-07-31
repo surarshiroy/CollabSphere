@@ -44,4 +44,11 @@ public class User {
 
     @OneToMany(mappedBy = "uploadedBy")
     private List<Attachment> attachments = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Notification> notifications = new ArrayList<>();
 }
