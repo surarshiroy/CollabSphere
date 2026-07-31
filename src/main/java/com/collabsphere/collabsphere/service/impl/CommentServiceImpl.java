@@ -4,6 +4,7 @@ import com.collabsphere.collabsphere.dto.*;
 import com.collabsphere.collabsphere.entity.*;
 import com.collabsphere.collabsphere.repository.*;
 import com.collabsphere.collabsphere.service.CommentService;
+import com.collabsphere.collabsphere.service.NotificationService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class CommentServiceImpl implements CommentService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final NotificationService notificationService;
 
     @Override
     public CommentResponse addComment(Long taskId,
@@ -48,6 +50,14 @@ public class CommentServiceImpl implements CommentService {
                 .build();
 
         comment = commentRepository.save(comment);
+        if (task.getAssignee() != null &&
+                !task.getAssignee().getId().equals(user.getId())) {
+
+            notificationService.createNotification(
+                    task.getAssignee(),
+                    user.getName() + " commented on task: " + task.getTitle()
+            );
+        }
 
         return CommentResponse.builder()
                 .id(comment.getId())
@@ -108,6 +118,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setUpdatedAt(LocalDateTime.now());
 
         comment = commentRepository.save(comment);
+
 
         return CommentResponse.builder()
                 .id(comment.getId())

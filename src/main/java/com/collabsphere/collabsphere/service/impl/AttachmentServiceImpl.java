@@ -3,6 +3,7 @@ package com.collabsphere.collabsphere.service.impl;
 import com.collabsphere.collabsphere.dto.AttachmentResponse;
 import com.collabsphere.collabsphere.entity.*;
 import com.collabsphere.collabsphere.repository.*;
+import com.collabsphere.collabsphere.service.NotificationService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import com.collabsphere.collabsphere.service.AttachmentService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final NotificationService notificationService;
 
     @Override
     public AttachmentResponse uploadAttachment(Long taskId,
@@ -38,8 +40,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         Project project = task.getProject();
         Team team = project.getTeam();
 
-        TeamMember teamMember = teamMemberRepository
-                .findByTeamAndUser(team, user)
+        teamMemberRepository.findByTeamAndUser(team, user)
                 .orElseThrow(() ->
                         new RuntimeException("You are not a member of this team"));
 
@@ -53,7 +54,40 @@ public class AttachmentServiceImpl implements AttachmentService {
                 .uploadedBy(user)
                 .build();
 
-        attachmentRepository.save(attachment);
+        attachment = attachmentRepository.save(attachment);
+
+        System.out.println("========== ATTACHMENT DEBUG ==========");
+        System.out.println("Current User : " + user.getName() + " (ID=" + user.getId() + ")");
+        System.out.println("Task         : " + task.getTitle());
+
+        if (task.getAssignee() == null) {
+            System.out.println("Task Assignee: NULL");
+        } else {
+            System.out.println("Task Assignee: "
+                    + task.getAssignee().getName()
+                    + " (ID=" + task.getAssignee().getId() + ")");
+        }
+
+        if (task.getAssignee() != null &&
+                !task.getAssignee().getId().equals(user.getId())) {
+
+            System.out.println("Condition PASSED");
+            System.out.println("Calling createNotification()...");
+
+            notificationService.createNotification(
+                    task.getAssignee(),
+                    user.getName() + " uploaded \""
+                            + attachment.getFileName()
+                            + "\" to task: "
+                            + task.getTitle()
+            );
+
+            System.out.println("createNotification() finished.");
+        } else {
+            System.out.println("Condition FAILED");
+        }
+
+        System.out.println("======================================");
 
         return AttachmentResponse.builder()
                 .id(attachment.getId())
