@@ -14,6 +14,10 @@ import com.collabsphere.collabsphere.service.TaskService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -80,7 +84,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponse> getTasksByProject(Long projectId) {
+    public List<TaskResponse> getTasksByProject(
+            Long projectId,
+            int page,
+            int size,
+            String sortBy,
+            String direction) {
 
 
         String email = SecurityUtil.getCurrentUserEmail();
@@ -97,7 +106,15 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() ->
                         new RuntimeException("You are not a member of this team"));
 
-        List<Task> tasks = taskRepository.findByProject(project);
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Task> taskPage = taskRepository.findByProject(project, pageable);
+
+        List<Task> tasks = taskPage.getContent();
 
         return tasks.stream()
                 .map(task -> TaskResponse.builder()

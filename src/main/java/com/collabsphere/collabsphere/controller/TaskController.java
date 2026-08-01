@@ -32,9 +32,27 @@ public class TaskController {
 
     @GetMapping
     public List<TaskResponse> getTasksByProject(
-            @PathVariable Long projectId) {
+            @PathVariable Long projectId,
 
-        return taskService.getTasksByProject(projectId);
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "5")
+            int size,
+
+            @RequestParam(defaultValue = "createdAt")
+            String sortBy,
+
+            @RequestParam(defaultValue = "desc")
+            String direction) {
+
+        return taskService.getTasksByProject(
+                projectId,
+                page,
+                size,
+                sortBy,
+                direction
+        );
     }
     @PutMapping("/{taskId}")
     public TaskResponse updateTask(

@@ -16,7 +16,13 @@ public interface TaskService {
 
     TaskResponse createTask(Long projectId, CreateTaskRequest request);
 
-    List<TaskResponse> getTasksByProject(Long projectId);
+    List<TaskResponse> getTasksByProject(
+            Long projectId,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    );
     void deleteTask(Long taskId);
     TaskResponse assignTask(Long taskId, AssignTaskRequest request);
     List<TaskResponse> searchTasks(Long projectId, String keyword);
