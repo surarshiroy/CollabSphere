@@ -234,4 +234,148 @@ public class TaskServiceImpl implements TaskService {
                 .createdAt(task.getCreatedAt())
                 .build();
     }
+    @Override
+    public List<TaskResponse> searchTasks(Long projectId, String keyword) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        Team team = project.getTeam();
+
+        teamMemberRepository.findByTeamAndUser(team, user)
+                .orElseThrow(() ->
+                        new RuntimeException("You are not a member of this team"));
+
+        List<Task> tasks =
+                taskRepository.findByProjectAndTitleContainingIgnoreCase(
+                        project,
+                        keyword
+                );
+
+        return tasks.stream()
+                .map(task -> TaskResponse.builder()
+                        .id(task.getId())
+                        .title(task.getTitle())
+                        .description(task.getDescription())
+                        .status(task.getStatus())
+                        .priority(task.getPriority())
+                        .createdBy(task.getCreatedBy().getName())
+                        .assignee(task.getAssignee() != null
+                                ? task.getAssignee().getName()
+                                : null)
+                        .createdAt(task.getCreatedAt())
+                        .build())
+                .toList();
+    }
+
+    @Override
+    public List<TaskResponse> getTasksByStatus(Long projectId, TaskStatus status) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        Team team = project.getTeam();
+
+        teamMemberRepository.findByTeamAndUser(team, user)
+                .orElseThrow(() ->
+                        new RuntimeException("You are not a member of this team"));
+
+        List<Task> tasks = taskRepository.findByProjectAndStatus(project, status);
+
+        return tasks.stream()
+                .map(task -> TaskResponse.builder()
+                        .id(task.getId())
+                        .title(task.getTitle())
+                        .description(task.getDescription())
+                        .status(task.getStatus())
+                        .priority(task.getPriority())
+                        .createdBy(task.getCreatedBy().getName())
+                        .assignee(task.getAssignee() != null
+                                ? task.getAssignee().getName()
+                                : null)
+                        .createdAt(task.getCreatedAt())
+                        .build())
+                .toList();
+    }
+    @Override
+    public List<TaskResponse> getTasksByPriority(Long projectId, TaskPriority priority) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        Team team = project.getTeam();
+
+        teamMemberRepository.findByTeamAndUser(team, user)
+                .orElseThrow(() ->
+                        new RuntimeException("You are not a member of this team"));
+
+        List<Task> tasks = taskRepository.findByProjectAndPriority(project, priority);
+
+        return tasks.stream()
+                .map(task -> TaskResponse.builder()
+                        .id(task.getId())
+                        .title(task.getTitle())
+                        .description(task.getDescription())
+                        .status(task.getStatus())
+                        .priority(task.getPriority())
+                        .createdBy(task.getCreatedBy().getName())
+                        .assignee(task.getAssignee() != null
+                                ? task.getAssignee().getName()
+                                : null)
+                        .createdAt(task.getCreatedAt())
+                        .build())
+                .toList();
+    }
+    @Override
+    public List<TaskResponse> getTasksByAssignee(Long projectId, Long userId) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        Team team = project.getTeam();
+
+        teamMemberRepository.findByTeamAndUser(team, currentUser)
+                .orElseThrow(() ->
+                        new RuntimeException("You are not a member of this team"));
+
+        User assignee = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Task> tasks = taskRepository.findByProjectAndAssignee(project, assignee);
+
+        return tasks.stream()
+                .map(task -> TaskResponse.builder()
+                        .id(task.getId())
+                        .title(task.getTitle())
+                        .description(task.getDescription())
+                        .status(task.getStatus())
+                        .priority(task.getPriority())
+                        .createdBy(task.getCreatedBy().getName())
+                        .assignee(task.getAssignee() != null
+                                ? task.getAssignee().getName()
+                                : null)
+                        .createdAt(task.getCreatedAt())
+                        .build())
+                .toList();
+    }
 }

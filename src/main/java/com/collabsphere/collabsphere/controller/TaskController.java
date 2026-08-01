@@ -4,6 +4,8 @@ import com.collabsphere.collabsphere.dto.AssignTaskRequest;
 import com.collabsphere.collabsphere.dto.CreateTaskRequest;
 import com.collabsphere.collabsphere.dto.TaskResponse;
 import com.collabsphere.collabsphere.dto.UpdateTaskRequest;
+import com.collabsphere.collabsphere.entity.TaskPriority;
+import com.collabsphere.collabsphere.entity.TaskStatus;
 import com.collabsphere.collabsphere.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -58,5 +60,33 @@ public class TaskController {
             @RequestBody AssignTaskRequest request) {
 
         return taskService.assignTask(taskId, request);
+    }
+    @GetMapping("/search")
+    public List<TaskResponse> searchTasks(
+            @PathVariable Long projectId,
+            @RequestParam String keyword) {
+
+        return taskService.searchTasks(projectId, keyword);
+    }
+    @GetMapping("/status")
+    public List<TaskResponse> getTasksByStatus(
+            @PathVariable Long projectId,
+            @RequestParam TaskStatus status) {
+
+        return taskService.getTasksByStatus(projectId, status);
+    }
+    @GetMapping("/priority")
+    public List<TaskResponse> getTasksByPriority(
+            @PathVariable Long projectId,
+            @RequestParam TaskPriority priority) {
+
+        return taskService.getTasksByPriority(projectId, priority);
+    }
+    @GetMapping("/assignee")
+    public List<TaskResponse> getTasksByAssignee(
+            @PathVariable Long projectId,
+            @RequestParam Long userId) {
+
+        return taskService.getTasksByAssignee(projectId, userId);
     }
 }
