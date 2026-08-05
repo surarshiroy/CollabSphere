@@ -14,6 +14,11 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     Page<Task> findByProject(Project project, Pageable pageable);
+    long countByCreatedBy(User user);
+
+    long countByAssignee(User user);
+
+    long countByAssigneeAndStatus(User user, TaskStatus status);
 
     // Search by title (case-insensitive)
     List<Task> findByProjectAndTitleContainingIgnoreCase(

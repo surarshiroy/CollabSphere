@@ -17,6 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.collabsphere.collabsphere.entity.Role;
 import java.time.LocalDateTime;
+import com.collabsphere.collabsphere.dto.UserProfileResponse;
+import com.collabsphere.collabsphere.dto.UpdateProfileRequest;
+import com.collabsphere.collabsphere.dto.ChangePasswordRequest;
+import com.collabsphere.collabsphere.util.SecurityUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -73,5 +77,61 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .build();
+    }
+    @Override
+    public UserProfileResponse getMyProfile() {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return UserProfileResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+    @Override
+    public UserProfileResponse updateMyProfile(UpdateProfileRequest request) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setName(request.getName());
+
+        user = userRepository.save(user);
+
+        return UserProfileResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+    @Override
+    public void changePassword(ChangePasswordRequest request) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(
+                request.getCurrentPassword(),
+                user.getPassword())) {
+
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.save(user);
     }
 }
