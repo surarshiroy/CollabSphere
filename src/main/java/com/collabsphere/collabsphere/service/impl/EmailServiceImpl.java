@@ -22,11 +22,10 @@ public class EmailServiceImpl implements EmailService {
 
             brevoEmailService.sendEmail(
                     to,
-                    "",
+                    "User",
                     subject,
                     htmlBody
             );
-
             System.out.println("========== BREVO EMAIL SENT ==========");
 
         } catch (Exception e) {
