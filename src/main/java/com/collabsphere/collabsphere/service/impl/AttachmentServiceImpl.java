@@ -3,6 +3,7 @@ package com.collabsphere.collabsphere.service.impl;
 import com.collabsphere.collabsphere.dto.AttachmentResponse;
 import com.collabsphere.collabsphere.entity.*;
 import com.collabsphere.collabsphere.repository.*;
+import com.collabsphere.collabsphere.service.EmailService;
 import com.collabsphere.collabsphere.service.NotificationService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import com.collabsphere.collabsphere.service.AttachmentService;
@@ -23,6 +24,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final UserRepository userRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Override
     public AttachmentResponse uploadAttachment(Long taskId,
@@ -71,23 +73,29 @@ public class AttachmentServiceImpl implements AttachmentService {
         if (task.getAssignee() != null &&
                 !task.getAssignee().getId().equals(user.getId())) {
 
-            System.out.println("Condition PASSED");
-            System.out.println("Calling createNotification()...");
-
             notificationService.createNotification(
                     task.getAssignee(),
-                    user.getName() + " uploaded \""
-                            + attachment.getFileName()
-                            + "\" to task: "
-                            + task.getTitle()
+                    user.getName() + " uploaded \"" +
+                            attachment.getFileName() +
+                            "\" to task: " + task.getTitle()
             );
 
-            System.out.println("createNotification() finished.");
-        } else {
-            System.out.println("Condition FAILED");
-        }
+            try {
 
-        System.out.println("======================================");
+                emailService.sendAttachmentEmail(
+                        task.getAssignee().getEmail(),
+                        task.getAssignee().getName(),
+                        user.getName(),
+                        task.getTitle(),
+                        attachment.getFileName()
+                );
+
+            } catch (Exception e) {
+
+                System.out.println("Email could not be sent: " + e.getMessage());
+
+            }
+        }
 
         return AttachmentResponse.builder()
                 .id(attachment.getId())

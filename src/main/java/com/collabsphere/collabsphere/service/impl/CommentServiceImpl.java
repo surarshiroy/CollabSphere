@@ -4,6 +4,7 @@ import com.collabsphere.collabsphere.dto.*;
 import com.collabsphere.collabsphere.entity.*;
 import com.collabsphere.collabsphere.repository.*;
 import com.collabsphere.collabsphere.service.CommentService;
+import com.collabsphere.collabsphere.service.EmailService;
 import com.collabsphere.collabsphere.service.NotificationService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Override
     public CommentResponse addComment(Long taskId,
@@ -57,6 +59,22 @@ public class CommentServiceImpl implements CommentService {
                     task.getAssignee(),
                     user.getName() + " commented on task: " + task.getTitle()
             );
+
+            try {
+
+                emailService.sendCommentEmail(
+                        task.getAssignee().getEmail(),
+                        task.getAssignee().getName(),
+                        user.getName(),
+                        task.getTitle(),
+                        comment.getContent()
+                );
+
+            } catch (Exception e) {
+
+                System.out.println("Email could not be sent: " + e.getMessage());
+
+            }
         }
 
         return CommentResponse.builder()

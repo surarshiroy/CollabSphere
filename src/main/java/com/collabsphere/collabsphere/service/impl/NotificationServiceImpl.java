@@ -8,6 +8,7 @@ import com.collabsphere.collabsphere.repository.UserRepository;
 import com.collabsphere.collabsphere.service.NotificationService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public void createNotification(User user, String message) {
@@ -30,7 +32,20 @@ public class NotificationServiceImpl implements NotificationService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        notificationRepository.save(notification);
+        Notification savedNotification = notificationRepository.save(notification);
+
+        NotificationResponse response = NotificationResponse.builder()
+                .id(savedNotification.getId())
+                .message(savedNotification.getMessage())
+                .isRead(savedNotification.isRead())
+                .createdAt(savedNotification.getCreatedAt())
+                .build();
+
+        messagingTemplate.convertAndSendToUser(
+                user.getEmail(),
+                "/queue/notifications",
+                response
+        );
     }
 
     @Override

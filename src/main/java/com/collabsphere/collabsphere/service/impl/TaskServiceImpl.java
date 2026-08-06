@@ -9,6 +9,7 @@ import com.collabsphere.collabsphere.repository.ProjectRepository;
 import com.collabsphere.collabsphere.repository.TaskRepository;
 import com.collabsphere.collabsphere.repository.TeamMemberRepository;
 import com.collabsphere.collabsphere.repository.UserRepository;
+import com.collabsphere.collabsphere.service.EmailService;
 import com.collabsphere.collabsphere.service.NotificationService;
 import com.collabsphere.collabsphere.service.TaskService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
@@ -32,6 +33,7 @@ public class TaskServiceImpl implements TaskService {
     private final TeamMemberRepository teamMemberRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
 
     @Override
@@ -239,6 +241,17 @@ public class TaskServiceImpl implements TaskService {
                 assignee,
                 "You have been assigned to task: " + task.getTitle()
         );
+
+        try {
+            emailService.sendTaskAssignedEmail(
+                    assignee.getEmail(),
+                    assignee.getName(),
+                    task.getTitle(),
+                    currentUser.getName()
+            );
+        } catch (Exception e) {
+            System.out.println("Email could not be sent: " + e.getMessage());
+        }
 
         return TaskResponse.builder()
                 .id(task.getId())
