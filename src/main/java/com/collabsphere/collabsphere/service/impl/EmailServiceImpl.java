@@ -1,11 +1,7 @@
 package com.collabsphere.collabsphere.service.impl;
 
 import com.collabsphere.collabsphere.service.EmailService;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
     private final BrevoEmailService brevoEmailService;
 
-    private final JavaMailSender mailSender;
+
     @Override
     public void sendHtmlEmail(String to,
                               String subject,
