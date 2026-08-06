@@ -242,6 +242,8 @@ public class TaskServiceImpl implements TaskService {
                 "You have been assigned to task: " + task.getTitle()
         );
 
+        System.out.println("=== BEFORE EMAIL ===");
+
         try {
             emailService.sendTaskAssignedEmail(
                     assignee.getEmail(),
@@ -249,8 +251,12 @@ public class TaskServiceImpl implements TaskService {
                     task.getTitle(),
                     currentUser.getName()
             );
+
+            System.out.println("=== EMAIL SENT SUCCESSFULLY ===");
+
         } catch (Exception e) {
-            System.out.println("Email could not be sent: " + e.getMessage());
+            System.out.println("=== EMAIL FAILED ===");
+            e.printStackTrace();
         }
 
         return TaskResponse.builder()
