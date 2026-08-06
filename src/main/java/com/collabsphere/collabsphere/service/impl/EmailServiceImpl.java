@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
+    private final BrevoEmailService brevoEmailService;
 
     private final JavaMailSender mailSender;
     @Override
@@ -19,37 +20,25 @@ public class EmailServiceImpl implements EmailService {
                               String htmlBody) {
 
         try {
-            System.out.println("========== EMAIL DEBUG START ==========");
+
+            System.out.println("========== BREVO EMAIL ==========");
             System.out.println("TO = " + to);
-            System.out.println("MAIL_USERNAME = " + System.getenv("MAIL_USERNAME"));
 
-            MimeMessage message = mailSender.createMimeMessage();
+            brevoEmailService.sendEmail(
+                    to,
+                    "",
+                    subject,
+                    htmlBody
+            );
 
-
-
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true);
-
-
-            helper.setFrom(System.getenv("MAIL_USERNAME"));
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlBody, true);
-
-            System.out.println("FROM = " + System.getenv("MAIL_USERNAME"));
-            System.out.println("SUBJECT = " + subject);
-            System.out.println("About to call mailSender.send()");
-
-            mailSender.send(message);
-
-            System.out.println("========== EMAIL SENT SUCCESSFULLY ==========");
+            System.out.println("========== BREVO EMAIL SENT ==========");
 
         } catch (Exception e) {
-        System.out.println("=== EMAIL FAILED ===");
-            System.out.println("Exception Type = " + e.getClass().getName());
-            System.out.println("Message = " + e.getMessage());
-        e.printStackTrace();
-    }
+
+            System.out.println("========== BREVO FAILED ==========");
+            e.printStackTrace();
+        }
+
     }
 
     @Override
