@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
-
     @Override
     public void sendHtmlEmail(String to,
                               String subject,
@@ -21,7 +20,11 @@ public class EmailServiceImpl implements EmailService {
 
         try {
 
+            System.out.println("1. Creating MimeMessage");
+
             MimeMessage message = mailSender.createMimeMessage();
+
+            System.out.println("2. MimeMessage created");
 
             MimeMessageHelper helper =
                     new MimeMessageHelper(message, true);
@@ -30,12 +33,18 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
 
+            System.out.println("3. About to call mailSender.send()");
+
             mailSender.send(message);
 
+            System.out.println("4. mailSender.send() finished");
+
         } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email", e);
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
+
     @Override
     public void sendNotificationEmail(
             String to,
