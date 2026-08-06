@@ -39,10 +39,10 @@ public class EmailServiceImpl implements EmailService {
 
             System.out.println("4. mailSender.send() finished");
 
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        } catch (Exception e) {
+        System.out.println("=== EMAIL FAILED ===");
+        e.printStackTrace();
+    }
     }
 
     @Override
