@@ -19,28 +19,35 @@ public class EmailServiceImpl implements EmailService {
                               String htmlBody) {
 
         try {
-
-            System.out.println("1. Creating MimeMessage");
+            System.out.println("========== EMAIL DEBUG START ==========");
+            System.out.println("TO = " + to);
+            System.out.println("MAIL_USERNAME = " + System.getenv("MAIL_USERNAME"));
 
             MimeMessage message = mailSender.createMimeMessage();
 
-            System.out.println("2. MimeMessage created");
+
 
             MimeMessageHelper helper =
                     new MimeMessageHelper(message, true);
 
+
+            helper.setFrom(System.getenv("MAIL_USERNAME"));
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
 
-            System.out.println("3. About to call mailSender.send()");
+            System.out.println("FROM = " + System.getenv("MAIL_USERNAME"));
+            System.out.println("SUBJECT = " + subject);
+            System.out.println("About to call mailSender.send()");
 
             mailSender.send(message);
 
-            System.out.println("4. mailSender.send() finished");
+            System.out.println("========== EMAIL SENT SUCCESSFULLY ==========");
 
         } catch (Exception e) {
         System.out.println("=== EMAIL FAILED ===");
+            System.out.println("Exception Type = " + e.getClass().getName());
+            System.out.println("Message = " + e.getMessage());
         e.printStackTrace();
     }
     }
