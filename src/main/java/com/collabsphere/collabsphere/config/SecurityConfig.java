@@ -103,8 +103,8 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/teams/*/projects/*"
+                                org.springframework.http.HttpMethod.DELETE,
+                                "/api/teams/**/projects/**"
                         ).authenticated()
 
                         .anyRequest().authenticated()
