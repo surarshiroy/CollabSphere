@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.collabsphere.collabsphere.dto.TeamResponse;
 
 import java.util.List;
+import com.collabsphere.collabsphere.dto.MemberResponse;
 
 @RestController
 @RequestMapping("/api/teams")
@@ -31,6 +32,12 @@ public class TeamController {
 
         return ResponseEntity.ok(teamService.getMyTeams());
 
+    }
+    @GetMapping("/{teamId}/members")
+    public ResponseEntity<List<MemberResponse>> getTeamMembers(
+            @PathVariable Long teamId) {
+
+        return ResponseEntity.ok(teamService.getTeamMembers(teamId));
     }
     @PostMapping("/{teamId}/members")
     public ResponseEntity<String> addMember(

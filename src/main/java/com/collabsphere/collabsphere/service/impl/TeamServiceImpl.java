@@ -24,6 +24,7 @@ import com.collabsphere.collabsphere.entity.TeamRole;
 import com.collabsphere.collabsphere.entity.User;
 
 import org.springframework.transaction.annotation.Transactional;
+import com.collabsphere.collabsphere.dto.MemberResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -122,5 +123,33 @@ public class TeamServiceImpl implements TeamService {
                 .build();
 
         teamMemberRepository.save(member);
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<MemberResponse> getTeamMembers(Long teamId) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Current user not found"));
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        // Make sure the logged-in user belongs to this team
+        teamMemberRepository.findByTeamAndUser(team, currentUser)
+                .orElseThrow(() ->
+                        new RuntimeException("You are not a member of this team"));
+
+        return teamMemberRepository.findByTeam(team)
+                .stream()
+                .map(member -> MemberResponse.builder()
+                        .id(member.getId())
+                        .name(member.getUser().getName())
+                        .email(member.getUser().getEmail())
+                        .role(member.getTeamRole())
+                        .joinedAt(member.getJoinedAt())
+                        .build())
+                .toList();
     }
 }

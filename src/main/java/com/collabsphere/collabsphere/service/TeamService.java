@@ -3,6 +3,7 @@ package com.collabsphere.collabsphere.service;
 import com.collabsphere.collabsphere.dto.AddMemberRequest;
 import com.collabsphere.collabsphere.dto.CreateTeamRequest;
 import com.collabsphere.collabsphere.dto.TeamResponse;
+import com.collabsphere.collabsphere.dto.MemberResponse;
 
 import java.util.List;
 
@@ -13,5 +14,6 @@ public interface TeamService {
     List<TeamResponse> getMyTeams();
 
     void addMember(Long teamId, AddMemberRequest request);
+    List<MemberResponse> getTeamMembers(Long teamId);
 
 }
