@@ -91,7 +91,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        ))
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -102,20 +104,8 @@ public class SecurityConfig {
                                 "/ws"
                         ).permitAll()
 
-                        .requestMatchers(
-                                org.springframework.http.HttpMethod.DELETE,
-                                "/api/teams/**/projects/**"
-                        ).authenticated()
-
                         .anyRequest().authenticated()
                 )
-
-//                .oauth2Login(oauth -> oauth
-//                        .userInfoEndpoint(userInfo ->
-//                                userInfo.userService(customOAuth2UserService)
-//                        )
-//                        .successHandler(oAuth2AuthenticationSuccessHandler)
-//                )
 
                 .authenticationProvider(authenticationProvider())
 
