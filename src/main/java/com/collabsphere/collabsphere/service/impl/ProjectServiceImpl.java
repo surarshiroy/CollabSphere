@@ -12,6 +12,7 @@ import com.collabsphere.collabsphere.service.ProjectService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.collabsphere.collabsphere.repository.TaskRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
     @Override
     public ProjectResponse createProject(Long teamId, CreateProjectRequest request) {
@@ -130,33 +132,57 @@ public class ProjectServiceImpl implements ProjectService {
     }
     @Override
     public void deleteProject(Long projectId) {
+
         System.out.println("========== DELETE PROJECT DEBUG ==========");
         System.out.println("Deleting project ID: " + projectId);
+
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
+
         String email = SecurityUtil.getCurrentUserEmail();
+
         System.out.println("Current logged-in email: " + email);
 
         User loggedInUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
         System.out.println("Logged-in user ID: " + loggedInUser.getId());
         System.out.println("Logged-in user name: " + loggedInUser.getName());
+
         Team team = project.getTeam();
+
         System.out.println("Project team ID: " + team.getId());
         System.out.println("Project team name: " + team.getName());
+
         TeamMember currentMember = teamMemberRepository
                 .findByTeamAndUser(team, loggedInUser)
-                .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
+                .orElseThrow(() ->
+                        new RuntimeException("You are not a member of this team"));
+
         if (currentMember.getTeamRole() != TeamRole.OWNER) {
             throw new RuntimeException("Only OWNER can delete projects");
         }
+
         System.out.println(
                 "Current user's TEAM ROLE: " +
                         currentMember.getTeamRole()
         );
+
         System.out.println("OWNER CHECK PASSED.");
-        System.out.println("DELETING PROJECT NOW.");
+
+        // Delete tasks first because tasks have a foreign key
+        // pointing to the project.
+        System.out.println("Deleting tasks belonging to project...");
+
+        taskRepository.deleteByProject(project);
+
+        System.out.println("Tasks deleted.");
+
+        // Now the project can safely be deleted.
+        System.out.println("Deleting project...");
+
         projectRepository.delete(project);
 
+        System.out.println("PROJECT DELETED SUCCESSFULLY.");
     }
 }

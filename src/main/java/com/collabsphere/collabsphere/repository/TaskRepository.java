@@ -1,4 +1,5 @@
 package com.collabsphere.collabsphere.repository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     Page<Task> findByProject(Project project, Pageable pageable);
+
     long countByCreatedBy(User user);
 
     long countByAssignee(User user);
@@ -43,4 +45,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             Project project,
             User assignee
     );
+
+    // Delete all tasks belonging to a project
+    void deleteByProject(Project project);
 }
