@@ -30,17 +30,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
+        System.out.println("========== JWT DEBUG ==========");
+        System.out.println("Request: " + request.getMethod() + " " + request.getRequestURI());
+        System.out.println("Authorization header exists: " + (authHeader != null));
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("NO VALID BEARER TOKEN");
             filterChain.doFilter(request, response);
             return;
         }
+
         String jwt = authHeader.substring(7);
+
+        System.out.println("JWT found.");
+
         String username = jwtService.extractUsername(jwt);
+
+        System.out.println("JWT username: " + username);
+
         if (username != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            UserDetails userDetails =
+                    userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+
+                System.out.println("JWT is VALID for: " + userDetails.getUsername());
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
@@ -50,14 +66,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         );
 
                 authenticationToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
                 );
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authenticationToken);
             }
         }
-        filterChain.doFilter(request, response);
 
+        System.out.println(
+                "Authentication after JWT filter: " +
+                        SecurityContextHolder.getContext().getAuthentication()
+        );
+
+        System.out.println("==============================");
+
+        filterChain.doFilter(request, response);
     }
 
 }

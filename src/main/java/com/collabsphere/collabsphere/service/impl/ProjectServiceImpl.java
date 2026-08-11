@@ -130,19 +130,32 @@ public class ProjectServiceImpl implements ProjectService {
     }
     @Override
     public void deleteProject(Long projectId) {
+        System.out.println("========== DELETE PROJECT DEBUG ==========");
+        System.out.println("Deleting project ID: " + projectId);
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
         String email = SecurityUtil.getCurrentUserEmail();
+        System.out.println("Current logged-in email: " + email);
 
         User loggedInUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println("Logged-in user ID: " + loggedInUser.getId());
+        System.out.println("Logged-in user name: " + loggedInUser.getName());
         Team team = project.getTeam();
+        System.out.println("Project team ID: " + team.getId());
+        System.out.println("Project team name: " + team.getName());
         TeamMember currentMember = teamMemberRepository
                 .findByTeamAndUser(team, loggedInUser)
                 .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
         if (currentMember.getTeamRole() != TeamRole.OWNER) {
             throw new RuntimeException("Only OWNER can delete projects");
         }
+        System.out.println(
+                "Current user's TEAM ROLE: " +
+                        currentMember.getTeamRole()
+        );
+        System.out.println("OWNER CHECK PASSED.");
+        System.out.println("DELETING PROJECT NOW.");
         projectRepository.delete(project);
 
     }
