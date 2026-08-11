@@ -1,13 +1,12 @@
 package com.collabsphere.collabsphere.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import com.collabsphere.collabsphere.entity.Project;
 import com.collabsphere.collabsphere.entity.Task;
 import com.collabsphere.collabsphere.entity.TaskPriority;
 import com.collabsphere.collabsphere.entity.TaskStatus;
 import com.collabsphere.collabsphere.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     long countByAssigneeAndStatus(User user, TaskStatus status);
 
-    // Search by title (case-insensitive)
+    // Search by title
     List<Task> findByProjectAndTitleContainingIgnoreCase(
             Project project,
             String keyword

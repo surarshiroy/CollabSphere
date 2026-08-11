@@ -48,4 +48,13 @@ public class TeamController {
 
         return ResponseEntity.ok("Member added successfully");
     }
+    // DELETE TEAM
+    @DeleteMapping("/{teamId}")
+    public ResponseEntity<String> deleteTeam(
+            @PathVariable Long teamId) {
+
+        teamService.deleteTeam(teamId);
+
+        return ResponseEntity.ok("Team deleted successfully");
+    }
 }
