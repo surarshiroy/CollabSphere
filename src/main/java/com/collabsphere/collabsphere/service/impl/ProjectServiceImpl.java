@@ -5,6 +5,7 @@ import com.collabsphere.collabsphere.dto.ProjectResponse;
 import com.collabsphere.collabsphere.dto.UpdateProjectRequest;
 import com.collabsphere.collabsphere.entity.*;
 import com.collabsphere.collabsphere.repository.ProjectRepository;
+import com.collabsphere.collabsphere.repository.TaskRepository;
 import com.collabsphere.collabsphere.repository.TeamMemberRepository;
 import com.collabsphere.collabsphere.repository.TeamRepository;
 import com.collabsphere.collabsphere.repository.UserRepository;
@@ -12,7 +13,6 @@ import com.collabsphere.collabsphere.service.ProjectService;
 import com.collabsphere.collabsphere.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.collabsphere.collabsphere.repository.TaskRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,23 +27,35 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
 
+
     @Override
-    public ProjectResponse createProject(Long teamId, CreateProjectRequest request) {
+    public ProjectResponse createProject(
+            Long teamId,
+            CreateProjectRequest request) {
 
         String email = SecurityUtil.getCurrentUserEmail();
 
         User loggedInUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Team not found"));
+
         TeamMember currentMember = teamMemberRepository
                 .findByTeamAndUser(team, loggedInUser)
-                .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "You are not a member of this team"
+                        ));
 
         if (currentMember.getTeamRole() != TeamRole.OWNER &&
                 currentMember.getTeamRole() != TeamRole.ADMIN) {
 
-            throw new RuntimeException("Only OWNER or ADMIN can create projects");
+            throw new RuntimeException(
+                    "Only OWNER or ADMIN can create projects"
+            );
         }
 
         Project project = Project.builder()
@@ -54,6 +66,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .team(team)
                 .createdBy(loggedInUser)
                 .build();
+
         Project savedProject = projectRepository.save(project);
 
         return ProjectResponse.builder()
@@ -61,10 +74,11 @@ public class ProjectServiceImpl implements ProjectService {
                 .name(savedProject.getName())
                 .description(savedProject.getDescription())
                 .status(savedProject.getStatus())
-                .createdBy(savedProject.getCreatedBy().getName()) // If your User entity doesn't have getName(), use getEmail()
+                .createdBy(savedProject.getCreatedBy().getName())
                 .createdAt(savedProject.getCreatedAt())
                 .build();
     }
+
 
     @Override
     public List<ProjectResponse> getProjectsByTeam(Long teamId) {
@@ -72,95 +86,151 @@ public class ProjectServiceImpl implements ProjectService {
         String email = SecurityUtil.getCurrentUserEmail();
 
         User loggedInUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Team not found"));
 
-        TeamMember currentMember = teamMemberRepository
+        teamMemberRepository
                 .findByTeamAndUser(team, loggedInUser)
-                .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "You are not a member of this team"
+                        ));
 
-        List<Project> projects = projectRepository.findByTeam(team);
+        List<Project> projects =
+                projectRepository.findByTeam(team);
 
         return projects.stream()
-                .map(project -> ProjectResponse.builder()
-                        .id(project.getId())
-                        .name(project.getName())
-                        .description(project.getDescription())
-                        .status(project.getStatus())
-                        .createdBy(project.getCreatedBy().getName())
-                        .createdAt(project.getCreatedAt())
-                        .build())
+                .map(project ->
+                        ProjectResponse.builder()
+                                .id(project.getId())
+                                .name(project.getName())
+                                .description(project.getDescription())
+                                .status(project.getStatus())
+                                .createdBy(
+                                        project.getCreatedBy().getName()
+                                )
+                                .createdAt(
+                                        project.getCreatedAt()
+                                )
+                                .build()
+                )
                 .toList();
     }
+
+
     @Override
-    public ProjectResponse updateProject(Long projectId, UpdateProjectRequest request) {
+    public ProjectResponse updateProject(
+            Long projectId,
+            UpdateProjectRequest request) {
+
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Project not found"));
 
         String email = SecurityUtil.getCurrentUserEmail();
 
         User loggedInUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
         Team team = project.getTeam();
 
         TeamMember currentMember = teamMemberRepository
                 .findByTeamAndUser(team, loggedInUser)
-                .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "You are not a member of this team"
+                        ));
 
         if (currentMember.getTeamRole() != TeamRole.OWNER &&
                 currentMember.getTeamRole() != TeamRole.ADMIN) {
 
-            throw new RuntimeException("Only OWNER or ADMIN can update projects");
+            throw new RuntimeException(
+                    "Only OWNER or ADMIN can update projects"
+            );
         }
+
         project.setName(request.getName());
         project.setDescription(request.getDescription());
         project.setStatus(request.getStatus());
 
-        Project updatedProject = projectRepository.save(project);
+        Project updatedProject =
+                projectRepository.save(project);
 
         return ProjectResponse.builder()
                 .id(updatedProject.getId())
                 .name(updatedProject.getName())
                 .description(updatedProject.getDescription())
                 .status(updatedProject.getStatus())
-                .createdBy(updatedProject.getCreatedBy().getName())
-                .createdAt(updatedProject.getCreatedAt())
+                .createdBy(
+                        updatedProject.getCreatedBy().getName()
+                )
+                .createdAt(
+                        updatedProject.getCreatedAt()
+                )
                 .build();
     }
+
+
     @Override
     public void deleteProject(Long projectId) {
 
-        System.out.println("========== DELETE PROJECT DEBUG ==========");
-        System.out.println("Deleting project ID: " + projectId);
+        System.out.println(
+                "========== DELETE PROJECT DEBUG =========="
+        );
+
+        System.out.println(
+                "Deleting project ID: " + projectId
+        );
 
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Project not found"));
 
         String email = SecurityUtil.getCurrentUserEmail();
 
-        System.out.println("Current logged-in email: " + email);
+        System.out.println(
+                "Current logged-in email: " + email
+        );
 
         User loggedInUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
-        System.out.println("Logged-in user ID: " + loggedInUser.getId());
-        System.out.println("Logged-in user name: " + loggedInUser.getName());
+        System.out.println(
+                "Logged-in user ID: " + loggedInUser.getId()
+        );
+
+        System.out.println(
+                "Logged-in user name: " + loggedInUser.getName()
+        );
 
         Team team = project.getTeam();
 
-        System.out.println("Project team ID: " + team.getId());
-        System.out.println("Project team name: " + team.getName());
+        System.out.println(
+                "Project team ID: " + team.getId()
+        );
+
+        System.out.println(
+                "Project team name: " + team.getName()
+        );
 
         TeamMember currentMember = teamMemberRepository
                 .findByTeamAndUser(team, loggedInUser)
                 .orElseThrow(() ->
-                        new RuntimeException("You are not a member of this team"));
+                        new RuntimeException(
+                                "You are not a member of this team"
+                        ));
 
         if (currentMember.getTeamRole() != TeamRole.OWNER) {
-            throw new RuntimeException("Only OWNER can delete projects");
+
+            throw new RuntimeException(
+                    "Only OWNER can delete projects"
+            );
         }
 
         System.out.println(
@@ -170,19 +240,27 @@ public class ProjectServiceImpl implements ProjectService {
 
         System.out.println("OWNER CHECK PASSED.");
 
-        // Delete tasks first because tasks have a foreign key
-        // pointing to the project.
-        System.out.println("Deleting tasks belonging to project...");
+        /*
+         * IMPORTANT:
+         *
+         * Tasks have a foreign-key relationship with projects.
+         * Therefore, tasks must be deleted BEFORE the project.
+         */
+
+        System.out.println(
+                "Deleting tasks belonging to project..."
+        );
 
         taskRepository.deleteByProject(project);
 
         System.out.println("Tasks deleted.");
 
-        // Now the project can safely be deleted.
         System.out.println("Deleting project...");
 
         projectRepository.delete(project);
 
-        System.out.println("PROJECT DELETED SUCCESSFULLY.");
+        System.out.println(
+                "PROJECT DELETED SUCCESSFULLY."
+        );
     }
 }
