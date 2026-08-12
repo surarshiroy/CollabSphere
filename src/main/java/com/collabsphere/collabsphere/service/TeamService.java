@@ -1,9 +1,6 @@
 package com.collabsphere.collabsphere.service;
 
-import com.collabsphere.collabsphere.dto.AddMemberRequest;
-import com.collabsphere.collabsphere.dto.CreateTeamRequest;
-import com.collabsphere.collabsphere.dto.MemberResponse;
-import com.collabsphere.collabsphere.dto.TeamResponse;
+import com.collabsphere.collabsphere.dto.*;
 
 import java.util.List;
 
@@ -18,4 +15,13 @@ public interface TeamService {
     List<MemberResponse> getTeamMembers(Long teamId);
 
     void deleteTeam(Long teamId);
+
+    TeamResponse updateTeam(
+            Long teamId,
+            UpdateTeamRequest request
+    );
+    void removeMember(
+            Long teamId,
+            Long memberId
+    );
 }

@@ -19,7 +19,7 @@ import com.collabsphere.collabsphere.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.collabsphere.collabsphere.dto.UpdateTeamRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -274,5 +274,157 @@ public class TeamServiceImpl implements TeamService {
         // =====================================================
 
         teamRepository.delete(team);
+    }
+    @Override
+    @Transactional
+    public TeamResponse updateTeam(
+            Long teamId,
+            UpdateTeamRequest request) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() ->
+                        new RuntimeException("Team not found"));
+
+        TeamMember currentMember =
+                teamMemberRepository
+                        .findByTeamAndUser(team, currentUser)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "You are not a member of this team"
+                                ));
+
+        // OWNER or ADMIN can update
+        if (currentMember.getTeamRole() != TeamRole.OWNER &&
+                currentMember.getTeamRole() != TeamRole.ADMIN) {
+
+            throw new RuntimeException(
+                    "Only OWNER or ADMIN can update teams"
+            );
+        }
+
+        team.setName(request.getName());
+        team.setDescription(request.getDescription());
+
+        Team updatedTeam =
+                teamRepository.save(team);
+
+        return TeamResponse.builder()
+                .id(updatedTeam.getId())
+                .name(updatedTeam.getName())
+                .description(updatedTeam.getDescription())
+                .role(currentMember.getTeamRole())
+                .build();
+    }
+    @Override
+    @Transactional
+    public void removeMember(
+            Long teamId,
+            Long memberId) {
+
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() ->
+                        new RuntimeException("Team not found"));
+
+        // =========================================
+        // CHECK CURRENT USER'S TEAM MEMBERSHIP
+        // =========================================
+
+        TeamMember currentMember =
+                teamMemberRepository
+                        .findByTeamAndUser(team, currentUser)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "You are not a member of this team"
+                                ));
+
+        TeamRole currentUserRole =
+                currentMember.getTeamRole();
+
+
+        // =========================================
+        // ONLY OWNER / ADMIN CAN REMOVE
+        // =========================================
+
+        if (currentUserRole != TeamRole.OWNER &&
+                currentUserRole != TeamRole.ADMIN) {
+
+            throw new RuntimeException(
+                    "You do not have permission to remove members"
+            );
+        }
+
+
+        // =========================================
+        // FIND MEMBER TO REMOVE
+        // =========================================
+
+        TeamMember memberToRemove =
+                teamMemberRepository.findById(memberId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Team member not found"
+                                ));
+
+
+        // =========================================
+        // MAKE SURE MEMBER BELONGS TO THIS TEAM
+        // =========================================
+
+        if (!memberToRemove.getTeam()
+                .getId()
+                .equals(team.getId())) {
+
+            throw new RuntimeException(
+                    "This member does not belong to this team"
+            );
+        }
+
+
+        TeamRole targetRole =
+                memberToRemove.getTeamRole();
+
+
+        // =========================================
+        // OWNER CANNOT BE REMOVED
+        // =========================================
+
+        if (targetRole == TeamRole.OWNER) {
+
+            throw new RuntimeException(
+                    "The team owner cannot be removed"
+            );
+        }
+
+
+        // =========================================
+        // ADMIN CAN ONLY REMOVE MEMBER
+        // =========================================
+
+        if (currentUserRole == TeamRole.ADMIN &&
+                targetRole != TeamRole.MEMBER) {
+
+            throw new RuntimeException(
+                    "Admins can only remove members"
+            );
+        }
+
+
+        // =========================================
+        // OWNER CAN REMOVE ADMIN OR MEMBER
+        // =========================================
+
+        teamMemberRepository.delete(memberToRemove);
     }
 }

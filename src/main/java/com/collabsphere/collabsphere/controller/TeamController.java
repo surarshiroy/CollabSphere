@@ -1,16 +1,13 @@
 package com.collabsphere.collabsphere.controller;
 
-import com.collabsphere.collabsphere.dto.AddMemberRequest;
-import com.collabsphere.collabsphere.dto.CreateTeamRequest;
+import com.collabsphere.collabsphere.dto.*;
 import com.collabsphere.collabsphere.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.collabsphere.collabsphere.dto.TeamResponse;
 
 import java.util.List;
-import com.collabsphere.collabsphere.dto.MemberResponse;
 
 @RestController
 @RequestMapping("/api/teams")
@@ -56,5 +53,23 @@ public class TeamController {
         teamService.deleteTeam(teamId);
 
         return ResponseEntity.ok("Team deleted successfully");
+    }
+    @PutMapping("/{teamId}")
+    public ResponseEntity<TeamResponse> updateTeam(
+            @PathVariable Long teamId,
+            @RequestBody UpdateTeamRequest request) {
+
+        return ResponseEntity.ok(
+                teamService.updateTeam(teamId, request)
+        );
+    }
+    @DeleteMapping("/{teamId}/members/{memberId}")
+    public ResponseEntity<Void> removeMember(
+            @PathVariable Long teamId,
+            @PathVariable Long memberId) {
+
+        teamService.removeMember(teamId, memberId);
+
+        return ResponseEntity.noContent().build();
     }
 }
