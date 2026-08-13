@@ -221,6 +221,12 @@ public class TaskServiceImpl implements TaskService {
         TeamMember currentMember = teamMemberRepository
                 .findByTeamAndUser(team, currentUser)
                 .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
+        System.out.println("========== ASSIGN DEBUG ==========");
+        System.out.println("Current user: " + currentUser.getEmail());
+        System.out.println("Team: " + team.getName());
+        System.out.println("Team role: " + currentMember.getTeamRole());
+        System.out.println("Requested assignee ID: " + request.getUserId());
+        System.out.println("=================================");
 
         if (currentMember.getTeamRole() != TeamRole.OWNER &&
                 currentMember.getTeamRole() != TeamRole.ADMIN) {
