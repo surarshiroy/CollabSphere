@@ -102,6 +102,9 @@ public class AttachmentServiceImpl implements AttachmentService {
                 .fileName(attachment.getFileName())
                 .contentType(attachment.getContentType())
                 .fileSize(attachment.getFileSize())
+                .uploadedById(
+                        attachment.getUploadedBy().getId()
+                )
                 .uploadedBy(user.getName())
                 .uploadedAt(attachment.getUploadedAt())
                 .build();
@@ -132,6 +135,9 @@ public class AttachmentServiceImpl implements AttachmentService {
                         .fileName(attachment.getFileName())
                         .contentType(attachment.getContentType())
                         .fileSize(attachment.getFileSize())
+                        .uploadedById(
+                                attachment.getUploadedBy().getId()
+                        )
                         .uploadedBy(attachment.getUploadedBy().getName())
                         .uploadedAt(attachment.getUploadedAt())
                         .build())
