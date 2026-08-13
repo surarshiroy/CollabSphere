@@ -367,38 +367,31 @@ public class TeamServiceImpl implements TeamService {
 
 
         // =========================================
-        // FIND MEMBER TO REMOVE
+        // FIND MEMBER USING USER ID
         // =========================================
 
-        TeamMember memberToRemove =
-                teamMemberRepository.findById(memberId)
+        User userToRemove =
+                userRepository.findById(memberId)
                         .orElseThrow(() ->
                                 new RuntimeException(
-                                        "Team member not found"
+                                        "User not found"
                                 ));
 
-
-        // =========================================
-        // MAKE SURE MEMBER BELONGS TO THIS TEAM
-        // =========================================
-
-        if (!memberToRemove.getTeam()
-                .getId()
-                .equals(team.getId())) {
-
-            throw new RuntimeException(
-                    "This member does not belong to this team"
-            );
-        }
-
-
-        TeamRole targetRole =
-                memberToRemove.getTeamRole();
+        TeamMember memberToRemove =
+                teamMemberRepository
+                        .findByTeamAndUser(team, userToRemove)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "This user is not a member of this team"
+                                ));
 
 
         // =========================================
         // OWNER CANNOT BE REMOVED
         // =========================================
+
+        TeamRole targetRole =
+                memberToRemove.getTeamRole();
 
         if (targetRole == TeamRole.OWNER) {
 
@@ -422,7 +415,7 @@ public class TeamServiceImpl implements TeamService {
 
 
         // =========================================
-        // OWNER CAN REMOVE ADMIN OR MEMBER
+        // REMOVE MEMBER
         // =========================================
 
         teamMemberRepository.delete(memberToRemove);
