@@ -190,7 +190,7 @@ public class TeamServiceImpl implements TeamService {
         return teamMemberRepository.findByTeam(team)
                 .stream()
                 .map(member -> MemberResponse.builder()
-                        .id(member.getId())
+                        .id(member.getUser().getId())
                         .name(member.getUser().getName())
                         .email(member.getUser().getEmail())
                         .role(member.getTeamRole())
