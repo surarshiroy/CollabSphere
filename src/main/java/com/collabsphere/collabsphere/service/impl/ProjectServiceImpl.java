@@ -162,6 +162,7 @@ public class ProjectServiceImpl implements ProjectService {
         project.setName(request.getName());
         project.setDescription(request.getDescription());
         project.setStatus(request.getStatus());
+        project.setDeadline(request.getDeadline());
 
         Project updatedProject =
                 projectRepository.save(project);
