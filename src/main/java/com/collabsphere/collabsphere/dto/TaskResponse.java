@@ -26,4 +26,6 @@ public class TaskResponse {
     private String assignee;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime deadline;
 }

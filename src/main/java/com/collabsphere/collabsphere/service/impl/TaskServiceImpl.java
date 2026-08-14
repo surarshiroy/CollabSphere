@@ -65,6 +65,7 @@ public class TaskServiceImpl implements TaskService {
                 .priority(request.getPriority())
                 .status(TaskStatus.TODO)
                 .createdAt(LocalDateTime.now())
+                .deadline(request.getDeadline())
                 .project(project)
                 .createdBy(user)
                 .build();
@@ -82,6 +83,7 @@ public class TaskServiceImpl implements TaskService {
                         ? task.getAssignee().getName()
                         : null)
                 .createdAt(task.getCreatedAt())
+                .deadline(task.getDeadline())
                 .build();
     }
 
@@ -130,6 +132,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
@@ -161,6 +164,7 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(request.getDescription());
         task.setPriority(request.getPriority());
         task.setStatus(request.getStatus());
+        task.setDeadline(request.getDeadline());
 
         task = taskRepository.save(task);
 
@@ -175,6 +179,7 @@ public class TaskServiceImpl implements TaskService {
                         ? task.getAssignee().getName()
                         : null)
                 .createdAt(task.getCreatedAt())
+                .deadline(task.getDeadline())
                 .build();
     }
 
@@ -274,6 +279,7 @@ public class TaskServiceImpl implements TaskService {
                 .createdBy(task.getCreatedBy().getName())
                 .assignee(task.getAssignee().getName())
                 .createdAt(task.getCreatedAt())
+                .deadline(task.getDeadline())
                 .build();
     }
     @Override
@@ -311,6 +317,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
@@ -346,6 +353,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
@@ -380,6 +388,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
@@ -417,6 +426,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
