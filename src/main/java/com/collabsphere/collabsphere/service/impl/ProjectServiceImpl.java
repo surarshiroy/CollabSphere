@@ -2,6 +2,7 @@ package com.collabsphere.collabsphere.service.impl;
 
 import com.collabsphere.collabsphere.dto.CreateProjectRequest;
 import com.collabsphere.collabsphere.dto.ProjectResponse;
+import org.springframework.transaction.annotation.Transactional;
 import com.collabsphere.collabsphere.dto.UpdateProjectRequest;
 import com.collabsphere.collabsphere.entity.*;
 import com.collabsphere.collabsphere.repository.ProjectRepository;
@@ -186,6 +187,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
+    @Transactional
     public void deleteProject(Long projectId) {
 
         System.out.println(
