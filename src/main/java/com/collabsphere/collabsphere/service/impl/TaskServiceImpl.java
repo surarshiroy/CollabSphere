@@ -152,12 +152,27 @@ public class TaskServiceImpl implements TaskService {
 
         TeamMember teamMember = teamMemberRepository
                 .findByTeamAndUser(team, user)
-                .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
+                .orElseThrow(() ->
+                        new RuntimeException("You are not a member of this team"));
+
+        // DEBUG
+        System.out.println("========== UPDATE TASK DEBUG ==========");
+        System.out.println("Logged-in email : " + email);
+        System.out.println("User ID         : " + user.getId());
+        System.out.println("Team ID         : " + team.getId());
+        System.out.println("Team name       : " + team.getName());
+        System.out.println("TeamMember ID   : " + teamMember.getId());
+        System.out.println("Team role       : " + teamMember.getTeamRole());
+        System.out.println("Task ID         : " + taskId);
+        System.out.println("Task title      : " + task.getTitle());
+        System.out.println("======================================");
 
         if (teamMember.getTeamRole() != TeamRole.OWNER &&
                 teamMember.getTeamRole() != TeamRole.ADMIN) {
 
-            throw new RuntimeException("Only OWNER or ADMIN can update tasks");
+            throw new RuntimeException(
+                    "Only OWNER or ADMIN can update tasks"
+            );
         }
 
         task.setTitle(request.getTitle());
