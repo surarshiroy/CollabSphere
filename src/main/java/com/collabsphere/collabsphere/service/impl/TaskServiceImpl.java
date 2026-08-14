@@ -216,8 +216,12 @@ public class TaskServiceImpl implements TaskService {
                 .findByTeamAndUser(team, user)
                 .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
 
-        if (teamMember.getTeamRole() != TeamRole.OWNER) {
-            throw new RuntimeException("Only OWNER can delete tasks");
+        if (teamMember.getTeamRole() != TeamRole.OWNER &&
+                teamMember.getTeamRole() != TeamRole.ADMIN) {
+
+            throw new RuntimeException(
+                    "Only OWNER or ADMIN can delete tasks"
+            );
         }
 
         taskRepository.delete(task);

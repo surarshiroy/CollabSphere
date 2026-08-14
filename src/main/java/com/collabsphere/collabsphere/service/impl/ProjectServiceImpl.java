@@ -235,10 +235,11 @@ public class ProjectServiceImpl implements ProjectService {
                                 "You are not a member of this team"
                         ));
 
-        if (currentMember.getTeamRole() != TeamRole.OWNER) {
+        if (currentMember.getTeamRole() != TeamRole.OWNER &&
+                currentMember.getTeamRole() != TeamRole.ADMIN ) {
 
             throw new RuntimeException(
-                    "Only OWNER can delete projects"
+                    "Only OWNER and ADMIN can delete projects"
             );
         }
 
