@@ -22,4 +22,6 @@ public class ProjectResponse {
 
     private LocalDateTime createdAt;
 
+    private LocalDateTime deadline;
+
 }

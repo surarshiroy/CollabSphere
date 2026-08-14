@@ -63,6 +63,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .description(request.getDescription())
                 .status(ProjectStatus.ACTIVE)
                 .createdAt(LocalDateTime.now())
+                .deadline(request.getDeadline())
                 .team(team)
                 .createdBy(loggedInUser)
                 .build();
@@ -76,6 +77,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .status(savedProject.getStatus())
                 .createdBy(savedProject.getCreatedBy().getName())
                 .createdAt(savedProject.getCreatedAt())
+                .deadline(savedProject.getDeadline())
                 .build();
     }
 
@@ -115,6 +117,9 @@ public class ProjectServiceImpl implements ProjectService {
                                 )
                                 .createdAt(
                                         project.getCreatedAt()
+                                )
+                                .deadline(
+                                        project.getDeadline()
                                 )
                                 .build()
                 )
@@ -171,6 +176,9 @@ public class ProjectServiceImpl implements ProjectService {
                 )
                 .createdAt(
                         updatedProject.getCreatedAt()
+                )
+                .deadline(
+                        updatedProject.getDeadline()
                 )
                 .build();
     }
