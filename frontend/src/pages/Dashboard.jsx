@@ -250,19 +250,7 @@ setCompletedCount(totalCompleted);
                 </div>
 
 
-                {/* ================= ACTIVITY ================= */}
-
-                <div className="activity">
-
-                    <h2>
-                        Recent Activity
-                    </h2>
-
-                    <p>
-                        No activity yet.
-                    </p>
-
-                </div>
+            
 
 
             </div>
