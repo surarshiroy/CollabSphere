@@ -4,6 +4,8 @@ import com.collabsphere.collabsphere.entity.ProjectStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class UpdateProjectRequest {
@@ -13,5 +15,7 @@ public class UpdateProjectRequest {
     private String description;
 
     private ProjectStatus status;
+
+    private LocalDateTime deadline;
 
 }

@@ -1,13 +1,11 @@
 package com.collabsphere.collabsphere.controller;
 
-import com.collabsphere.collabsphere.dto.AddMemberRequest;
-import com.collabsphere.collabsphere.dto.CreateTeamRequest;
+import com.collabsphere.collabsphere.dto.*;
 import com.collabsphere.collabsphere.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.collabsphere.collabsphere.dto.TeamResponse;
 
 import java.util.List;
 
@@ -32,6 +30,12 @@ public class TeamController {
         return ResponseEntity.ok(teamService.getMyTeams());
 
     }
+    @GetMapping("/{teamId}/members")
+    public ResponseEntity<List<MemberResponse>> getTeamMembers(
+            @PathVariable Long teamId) {
+
+        return ResponseEntity.ok(teamService.getTeamMembers(teamId));
+    }
     @PostMapping("/{teamId}/members")
     public ResponseEntity<String> addMember(
             @PathVariable Long teamId,
@@ -40,5 +44,32 @@ public class TeamController {
         teamService.addMember(teamId, request);
 
         return ResponseEntity.ok("Member added successfully");
+    }
+    // DELETE TEAM
+    @DeleteMapping("/{teamId}")
+    public ResponseEntity<String> deleteTeam(
+            @PathVariable Long teamId) {
+
+        teamService.deleteTeam(teamId);
+
+        return ResponseEntity.ok("Team deleted successfully");
+    }
+    @PutMapping("/{teamId}")
+    public ResponseEntity<TeamResponse> updateTeam(
+            @PathVariable Long teamId,
+            @RequestBody UpdateTeamRequest request) {
+
+        return ResponseEntity.ok(
+                teamService.updateTeam(teamId, request)
+        );
+    }
+    @DeleteMapping("/{teamId}/members/{memberId}")
+    public ResponseEntity<Void> removeMember(
+            @PathVariable Long teamId,
+            @PathVariable Long memberId) {
+
+        teamService.removeMember(teamId, memberId);
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -65,6 +65,7 @@ public class TaskServiceImpl implements TaskService {
                 .priority(request.getPriority())
                 .status(TaskStatus.TODO)
                 .createdAt(LocalDateTime.now())
+                .deadline(request.getDeadline())
                 .project(project)
                 .createdBy(user)
                 .build();
@@ -82,6 +83,7 @@ public class TaskServiceImpl implements TaskService {
                         ? task.getAssignee().getName()
                         : null)
                 .createdAt(task.getCreatedAt())
+                .deadline(task.getDeadline())
                 .build();
     }
 
@@ -130,6 +132,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
@@ -149,18 +152,34 @@ public class TaskServiceImpl implements TaskService {
 
         TeamMember teamMember = teamMemberRepository
                 .findByTeamAndUser(team, user)
-                .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
+                .orElseThrow(() ->
+                        new RuntimeException("You are not a member of this team"));
+
+        // DEBUG
+        System.out.println("========== UPDATE TASK DEBUG ==========");
+        System.out.println("Logged-in email : " + email);
+        System.out.println("User ID         : " + user.getId());
+        System.out.println("Team ID         : " + team.getId());
+        System.out.println("Team name       : " + team.getName());
+        System.out.println("TeamMember ID   : " + teamMember.getId());
+        System.out.println("Team role       : " + teamMember.getTeamRole());
+        System.out.println("Task ID         : " + taskId);
+        System.out.println("Task title      : " + task.getTitle());
+        System.out.println("======================================");
 
         if (teamMember.getTeamRole() != TeamRole.OWNER &&
                 teamMember.getTeamRole() != TeamRole.ADMIN) {
 
-            throw new RuntimeException("Only OWNER or ADMIN can update tasks");
+            throw new RuntimeException(
+                    "Only OWNER or ADMIN can update tasks"
+            );
         }
 
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setPriority(request.getPriority());
         task.setStatus(request.getStatus());
+        task.setDeadline(request.getDeadline());
 
         task = taskRepository.save(task);
 
@@ -175,6 +194,7 @@ public class TaskServiceImpl implements TaskService {
                         ? task.getAssignee().getName()
                         : null)
                 .createdAt(task.getCreatedAt())
+                .deadline(task.getDeadline())
                 .build();
     }
 
@@ -196,8 +216,12 @@ public class TaskServiceImpl implements TaskService {
                 .findByTeamAndUser(team, user)
                 .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
 
-        if (teamMember.getTeamRole() != TeamRole.OWNER) {
-            throw new RuntimeException("Only OWNER can delete tasks");
+        if (teamMember.getTeamRole() != TeamRole.OWNER &&
+                teamMember.getTeamRole() != TeamRole.ADMIN) {
+
+            throw new RuntimeException(
+                    "Only OWNER or ADMIN can delete tasks"
+            );
         }
 
         taskRepository.delete(task);
@@ -221,6 +245,12 @@ public class TaskServiceImpl implements TaskService {
         TeamMember currentMember = teamMemberRepository
                 .findByTeamAndUser(team, currentUser)
                 .orElseThrow(() -> new RuntimeException("You are not a member of this team"));
+        System.out.println("========== ASSIGN DEBUG ==========");
+        System.out.println("Current user: " + currentUser.getEmail());
+        System.out.println("Team: " + team.getName());
+        System.out.println("Team role: " + currentMember.getTeamRole());
+        System.out.println("Requested assignee ID: " + request.getUserId());
+        System.out.println("=================================");
 
         if (currentMember.getTeamRole() != TeamRole.OWNER &&
                 currentMember.getTeamRole() != TeamRole.ADMIN) {
@@ -268,6 +298,7 @@ public class TaskServiceImpl implements TaskService {
                 .createdBy(task.getCreatedBy().getName())
                 .assignee(task.getAssignee().getName())
                 .createdAt(task.getCreatedAt())
+                .deadline(task.getDeadline())
                 .build();
     }
     @Override
@@ -305,6 +336,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
@@ -340,6 +372,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
@@ -374,6 +407,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }
@@ -411,6 +445,7 @@ public class TaskServiceImpl implements TaskService {
                                 ? task.getAssignee().getName()
                                 : null)
                         .createdAt(task.getCreatedAt())
+                        .deadline(task.getDeadline())
                         .build())
                 .toList();
     }

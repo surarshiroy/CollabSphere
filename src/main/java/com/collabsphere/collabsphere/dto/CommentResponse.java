@@ -13,10 +13,11 @@ public class CommentResponse {
 
     private String content;
 
+    private Long authorId;
+
     private String author;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
 }

@@ -22,14 +22,16 @@ public class ProjectController {
             @PathVariable Long teamId,
             @RequestBody CreateProjectRequest request) {
 
-
         return projectService.createProject(teamId, request);
     }
 
     @GetMapping
-    public List<ProjectResponse> getProjectsByTeam(@PathVariable Long teamId) {
+    public List<ProjectResponse> getProjectsByTeam(
+            @PathVariable Long teamId) {
+
         return projectService.getProjectsByTeam(teamId);
     }
+
     @PutMapping("/{projectId}")
     public ProjectResponse updateProject(
             @PathVariable Long teamId,
@@ -38,6 +40,7 @@ public class ProjectController {
 
         return projectService.updateProject(projectId, request);
     }
+
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(
             @PathVariable Long teamId,
@@ -47,5 +50,4 @@ public class ProjectController {
 
         return ResponseEntity.noContent().build();
     }
-
 }

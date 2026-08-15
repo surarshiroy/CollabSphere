@@ -16,6 +16,7 @@ public class AttachmentResponse {
     private String contentType;
 
     private Long fileSize;
+    private Long uploadedById;
 
     private String uploadedBy;
 
