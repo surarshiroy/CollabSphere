@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../services/authService";
 import { useEffect } from "react";
-
+import { wakeUpBackend } from "../services/healthService";
 import { getToken } from "../utils/token";
 
 import "../styles/login.css";
@@ -13,7 +13,9 @@ function Register() {
     useEffect(() => {
     if (getToken()) {
         navigate("/dashboard", { replace: true });
+        return;
     }
+    wakeUpBackend();
 }, [navigate]);
 
     const [formData, setFormData] = useState({

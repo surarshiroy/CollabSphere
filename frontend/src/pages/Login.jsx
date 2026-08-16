@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
+import { wakeUpBackend } from "../services/healthService"
 import { saveToken } from "../utils/token";
 import { useEffect } from "react";
 import { getToken } from "../utils/token";
@@ -12,7 +13,9 @@ function Login() {
     useEffect(() => {
     if (getToken()) {
         navigate("/dashboard", { replace: true });
+        return;
     }
+    wakeUpBackend();
 }, [navigate]);
 
     const [formData, setFormData] = useState({
