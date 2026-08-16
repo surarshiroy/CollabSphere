@@ -691,3 +691,13 @@
         font-size: 14px;
     }
 }
+/* ========================================================= */
+/* =============== FORCE INPUT PLACEHOLDERS =============== */
+/* ========================================================= */
+
+.login-card input::placeholder,
+.login-card .form-control::placeholder,
+.login-card .password-input::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
