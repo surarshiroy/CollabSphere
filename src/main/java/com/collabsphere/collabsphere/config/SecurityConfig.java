@@ -100,6 +100,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/health",
                                 "/login/**",
                                 "/ws/**",
                                 "/ws"
